@@ -3,8 +3,7 @@ import asyncio
 from pyrogram import Client, filters, enums
 from pyrogram.errors import FloodWait
 from pyrogram.errors.exceptions.bad_request_400 import ChannelInvalid, ChatAdminRequired, UsernameInvalid, UsernameNotModified
-from info import ADMINS
-from info import INDEX_REQ_CHANNEL as LOG_CHANNEL
+from info import ADMINS, INDEX_REQ_CHANNEL as LOG_CHANNEL
 from database.ia_filterdb import save_file
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from utils import temp
@@ -23,7 +22,7 @@ async def index_files(bot, query):
     if raju == 'reject':
         await query.message.delete()
         await bot.send_message(int(from_user),
-                               f'Your Submission for indexing {chat} has been decliened by our moderators.',
+                               f'Your Submission for indexing {chat} has been declined by our moderators.',
                                reply_to_message_id=int(lst_msg_id))
         return
 
@@ -83,13 +82,8 @@ async def send_for_index(bot, message):
 
     if message.from_user.id in ADMINS:
         buttons = [
-            [
-                InlineKeyboardButton('Yes',
-                                     callback_data=f'index#accept#{chat_id}#{last_msg_id}#{message.from_user.id}')
-            ],
-            [
-                InlineKeyboardButton('close', callback_data='close_data'),
-            ]
+            [InlineKeyboardButton('Yes', callback_data=f'index#accept#{chat_id}#{last_msg_id}#{message.from_user.id}')],
+            [InlineKeyboardButton('Close', callback_data='close_data')]
         ]
         reply_markup = InlineKeyboardMarkup(buttons)
         return await message.reply(
@@ -100,18 +94,12 @@ async def send_for_index(bot, message):
         try:
             link = (await bot.create_chat_invite_link(chat_id)).invite_link
         except ChatAdminRequired:
-            return await message.reply('Make sure iam an admin in the chat and have permission to invite users.')
+            return await message.reply('Make sure I am an admin in the chat and have permission to invite users.')
     else:
         link = f"@{message.forward_from_chat.username}"
     buttons = [
-        [
-            InlineKeyboardButton('Accept Index',
-                                 callback_data=f'index#accept#{chat_id}#{last_msg_id}#{message.from_user.id}')
-        ],
-        [
-            InlineKeyboardButton('Reject Index',
-                                 callback_data=f'index#reject#{chat_id}#{message.id}#{message.from_user.id}'),
-        ]
+        [InlineKeyboardButton('Accept Index', callback_data=f'index#accept#{chat_id}#{last_msg_id}#{message.from_user.id}')],
+        [InlineKeyboardButton('Reject Index', callback_data=f'index#reject#{chat_id}#{message.id}#{message.from_user.id}')]
     ]
     reply_markup = InlineKeyboardMarkup(buttons)
     await bot.send_message(LOG_CHANNEL,
