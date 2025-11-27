@@ -63,8 +63,8 @@ OWNER_UPI_ID = environ.get('OWNER_UPI_ID', 'deendayaldhaked@ybl')
 # ============================
 DATABASE_URI = environ.get('DATABASE_URI', "mongodb+srv://movie1:movie1@cluster0.pgyfk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 DATABASE_URI2 = environ.get('DATABASE_URI2', "mongodb+srv://movie2:movie2@cluster0.jicer.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-DATABASE_NAME = environ.get('DATABASE_NAME', "cluster")
-COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Deendayal_files')
+DATABASE_NAME = environ.get('DATABASE_NAME', "movie")
+COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Nandu_files')
 
 # ============================
 # Movie Notification & Update Settings
