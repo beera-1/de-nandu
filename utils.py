@@ -94,16 +94,13 @@ async def is_check_admin(bot, chat_id, user_id):
     except:
         return False
     
-async def get_movie_update_status(bot_id):
+async def get_status(bot_id):
     try:
-        status = await db.movie_update_status(bot_id)
-        if status is None:
-            logger.warning(f"No notification status found for bot with ID {bot_id}. Defaulting to 'False'.")
-            return False  
-        return status
+        return await db.movie_update_status(bot_id) or False  
     except Exception as e:
-        logger.error(f"Failed to fetch movie update notification status for bot {bot_id}: {e}")
-        return False 
+        logging.error(f"Error in get_movie_update_status: {e}")
+        return False  
+
     
 async def get_poster(query, bulk=False, id=False, file=None):
     if not id:
@@ -283,7 +280,6 @@ def get_file_id(msg: Message):
 
 def extract_user(message: Message) -> Union[int, str]:
     """extracts the user from a message"""
-    # https://github.com/SpEcHiDe/PyroGramBot/blob/f30e2cca12002121bad1982f68cd0ff9814ce027/pyrobot/helper_functions/extract_user.py#L7
     user_id = None
     user_first_name = None
     if message.reply_to_message:
@@ -354,10 +350,7 @@ def split_quotes(text: str) -> List:
         counter += 1
     else:
         return text.split(None, 1)
-
-    # 1 to avoid starting quote, and counter is exclusive so avoids ending
     key = remove_escapes(text[1:counter].strip())
-    # index will be in range, or `else` would have been executed and returned
     rest = text[counter + 1:].strip()
     if not key:
         key = text[0] + text[0]
@@ -794,7 +787,6 @@ async def send_all(bot, userid, files, ident, chat_id, user_name, query):
         await query.answer('Hᴇʏ, Sᴛᴀʀᴛ Bᴏᴛ Fɪʀsᴛ Aɴᴅ Cʟɪᴄᴋ Sᴇɴᴅ Aʟʟ', show_alert=True)
         
 async def get_cap(settings, remaining_seconds, files, query, total_results, search):
-    # Aᴅᴅᴇᴅ Bʏ @creatorrio
     if settings["imdb"]:
         IMDB_CAP = temp.IMDB_CAP.get(query.from_user.id)
         if IMDB_CAP:
@@ -864,4 +856,11 @@ async def log_error(client, error_message):
         print(f"Failed to log error: {e}")
 
 
-
+def get_time(seconds):
+    periods = [(' ᴅᴀʏs', 86400), (' ʜᴏᴜʀ', 3600), (' ᴍɪɴᴜᴛᴇ', 60), (' sᴇᴄᴏɴᴅ', 1)]
+    result = ''
+    for period_name, period_seconds in periods:
+        if seconds >= period_seconds:
+            period_value, seconds = divmod(seconds, period_seconds)
+            result += f'{int(period_value)}{period_name}'
+    return result
