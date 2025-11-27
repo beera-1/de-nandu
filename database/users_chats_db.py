@@ -6,21 +6,15 @@ import pytz
 from pymongo.errors import DuplicateKeyError
 from pymongo import MongoClient
 
-
-
 my_client = MongoClient(DATABASE_URI)
 mydb = my_client["filename"]
 
 async def add_name(user_id, filename):
     user_db = mydb[str(user_id)]
     user = {'_id': filename}
-    
-    # Check if the document already exists
     existing_user = user_db.find_one({'_id': filename})
     if existing_user is not None:
         return False
-    
-    # Attempt to insert the document
     try:
         user_db.insert_one(user)
         return True
@@ -131,6 +125,9 @@ class Database:
     
     async def delete_user(self, user_id):
         await self.col.delete_many({'id': int(user_id)})
+        
+    async def delete_chat(self, id):
+        await self.grp.delete_many({'id': int(id)})    
 
     async def get_banned(self):
         users = self.col.find({'ban_status.is_banned': True})
@@ -259,29 +256,28 @@ class Database:
         })
         return count
     
-    async def pm_search_status(self, bot_id):
-        bot = await self.botcol.find_one({'id': int(bot_id)}, {'bot_pm_search': 1})
-        return bot.get('bot_pm_search', PM_SEARCH) if bot else PM_SEARCH
-
-    async def update_pm_search_status(self, bot_id, enable):
+    async def get_bot_setting(self, bot_id, setting_key, default_value):
+        bot = await self.botcol.find_one({'id': int(bot_id)}, {setting_key: 1, '_id': 0})
+        return bot[setting_key] if bot and setting_key in bot else default_value
+    async def update_bot_setting(self, bot_id, setting_key, value):
         await self.botcol.update_one(
-            {'id': int(bot_id)},
-            {'$set': {'bot_pm_search': enable}},
+            {'id': int(bot_id)}, 
+            {'$set': {setting_key: value}}, 
             upsert=True
         )
-    
+
+    async def pm_search_status(self, bot_id):
+        return await self.get_bot_setting(bot_id, 'PM_SEARCH', PM_SEARCH)
+
+    async def update_pm_search_status(self, bot_id, enable):
+        await self.update_bot_setting(bot_id, 'PM_SEARCH', enable)
+
     async def movie_update_status(self, bot_id):
-        bot = await self.botcol.find_one({'id': int(bot_id)}, {'DEENDAYAL_MOVIE_UPDATE_NOTIFICATION': 1})
-        return bot.get('DEENDAYAL_MOVIE_UPDATE_NOTIFICATION', DEENDAYAL_MOVIE_UPDATE_NOTIFICATION) if bot else DEENDAYAL_MOVIE_UPDATE_NOTIFICATION   
+        return await self.get_bot_setting(bot_id, 'DEENDAYAL_MOVIE_UPDATE_NOTIFICATION', DEENDAYAL_MOVIE_UPDATE_NOTIFICATION)
 
     async def update_movie_update_status(self, bot_id, enable):
-            await self.botcol.update_one(
-                {'id': int(bot_id)},
-                {'$set': {'DEENDAYAL_MOVIE_UPDATE_NOTIFICATION': enable}},
-                upsert=True
-            )
-    
-        
+        await self.update_bot_setting(bot_id, 'DEENDAYAL_MOVIE_UPDATE_NOTIFICATION', enable)
+
         
 db = Database(DATABASE_URI, DATABASE_NAME)
 db2 = Database(DATABASE_URI2, DATABASE_NAME)
