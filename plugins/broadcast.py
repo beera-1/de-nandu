@@ -19,13 +19,7 @@ async def broadcast(bot, message):
     deleted = 0
     failed =0
     success = 0
-
-    btn = InlineKeyboardMarkup(
-        [
-            [InlineKeyboardButton(" Sᴇᴀʀᴄʜ ʜᴇʀᴇ", url=GRP_LNK)]
-        ]
-    )
-
+    btn = InlineKeyboardMarkup([[InlineKeyboardButton(" Sᴇᴀʀᴄʜ ʜᴇʀᴇ", url=GRP_LNK)]])
     async for user in users:
         pti, sh = await broadcast_messages(int(user['id']), b_msg, reply_markup=btn)
         if pti:
@@ -73,11 +67,16 @@ async def remove_junkuser__db(bot, message):
     await bot.send_message(message.chat.id, f"Completed:\nCompleted in {time_taken} seconds.\n\nTotal Users {total_users}\nCompleted: {done} / {total_users}\nBlocked: {blocked}\nDeleted: {deleted}")
 
 
-@Client.on_message(filters.command("group_broadcast") & filters.user(ADMINS) & filters.reply)
+@Client.on_message(filters.command("grp_broadcast") & filters.user(ADMINS) & filters.reply)
 async def broadcast_group(bot, message):
     groups = await db.get_all_chats()
+    if not groups:
+        grp = await message.reply_text("❌ Nᴏ ɢʀᴏᴜᴘs ғᴏᴜɴᴅ ғᴏʀ ʙʀᴏᴀᴅᴄᴀsᴛɪɴɢ.")
+        await asyncio.sleep(60)
+        await grp.delete()
+        return
     b_msg = message.reply_to_message
-    sts = await message.reply_text(text='Broadcasting your messages To Groups...')
+    sts = await message.reply_text(text='Bʀᴏᴀᴅᴄᴀsᴛɪɴɢ ʏᴏᴜʀ ᴍᴇssᴀɢᴇs Tᴏ Gʀᴏᴜᴘs...')
     start_time = time.time()
     total_groups = await db.total_chat_count()
     done = 0
@@ -114,6 +113,11 @@ async def broadcast_group(bot, message):
 @Client.on_message(filters.command(["junk_group", "clear_junk_group"]) & filters.user(ADMINS))
 async def junk_clear_group(bot, message):
     groups = await db.get_all_chats()
+    if not groups:
+        grp = await message.reply_text("❌ Nᴏ ɢʀᴏᴜᴘs ғᴏᴜɴᴅ ғᴏʀ ᴄʟᴇᴀʀ Jᴜɴᴋ ɢʀᴏᴜᴘs.")
+        await asyncio.sleep(60)
+        await grp.delete()
+        return
     b_msg = message
     sts = await message.reply_text(text='..............')
     start_time = time.time()
@@ -192,8 +196,6 @@ async def clear_junk(user_id, message):
     except Exception as e:
         return False, "Error"
 
-
-
 async def broadcast_messages(user_id, message, reply_markup=None):
     try:
         await message.copy(chat_id=user_id,reply_markup=reply_markup)
@@ -214,12 +216,3 @@ async def broadcast_messages(user_id, message, reply_markup=None):
         return False, "Error"
     except Exception as e:
         return False, "Error"
-
-
-
-
-
-
-
-
-
