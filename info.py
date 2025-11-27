@@ -79,7 +79,7 @@ CAPTION_LANGUAGES = ["Bhojpuri", "Hindi", "Bengali", "Tamil", "English", "Bangla
 VERIFY = bool(environ.get('VERIFY', False))  # Verification On (True) / Off (False)
 DEENDAYAL_VERIFY_EXPIRE = int(environ.get('DEENDAYAL_VERIFY_EXPIRE', 24))  # Add time in hours
 DEENDAYAL_VERIFIED_LOG = int(environ.get('DEENDAYAL_VERIFIED_LOG', '-1002370988072'))  # Log channel id (make sure bot is admin)
-HOW_TO_VERIFY = environ.get('HOW_TO_VERIFY', 'https://t.me/see_tutorial/3')  # How to open tutorial link for verification
+HOW_TO_VERIFY = environ.get('HOW_TO_VERIFY', 'https://t.me/How_To_Open_the_Link_01')  # How to open tutorial link for verification
 
 # ============================
 # Link Shortener Configuration
@@ -87,15 +87,15 @@ HOW_TO_VERIFY = environ.get('HOW_TO_VERIFY', 'https://t.me/see_tutorial/3')  # H
 IS_SHORTLINK = bool(environ.get('IS_SHORTLINK', False))
 SHORTLINK_URL = environ.get('SHORTLINK_URL', 'shortxlinks.com')
 SHORTLINK_API = environ.get('SHORTLINK_API', 'd73e70a35dc3877fa14afbf51fa8ec312c94780c')
-TUTORIAL = environ.get('TUTORIAL', 'https://t.me/see_tutorial/3')  # Tutorial video link for opening shortlink website
+TUTORIAL = environ.get('TUTORIAL', 'https://t.me/How_To_Open_the_Link_01')  # Tutorial video link for opening shortlink website
 IS_TUTORIAL = bool(environ.get('IS_TUTORIAL', False))
 
 # ============================
 # Channel & Group Links Configuration
 # ============================
-GRP_LNK = environ.get('GRP_LNK', 'https://t.me/MOVIE_KELU_MAGA')
-CHNL_LNK = environ.get('CHNL_LNK', 'https://t.me/NEW_RELEASED_MAGA')
-OWNER_LNK = environ.get('OWNER_LNK', 'https://t.me/MOVIE_KELU_MAGA')
+GRP_LNK = environ.get('GRP_LNK', 'https://t.me/+P6XxYucEerFmZGQ1')
+CHNL_LNK = environ.get('CHNL_LNK', 'https://t.me/+-Fxa5bWuGV5iZGM1')
+OWNER_LNK = environ.get('OWNER_LNK', 'https://t.me/Contact_AddaFileZ_bot')
 DEENDAYAL_MOVIE_UPDATE_CHANNEL_LNK = environ.get('DEENDAYAL_MOVIE_UPDATE_CHANNEL_LNK', 'https://t.me/+9aY2VU4T8jA4MGE1')
 OWNERID = int(os.environ.get('OWNERID', '6390511215'))  # Replace with the actual admin ID
 
@@ -138,7 +138,7 @@ EMOJI_MODE = bool(environ.get('EMOJI_MODE', True))  # Emoji status On (True) / O
 # ============================
 # Bot Configuration
 # ============================
-auth_grp = environ.get('AUTH_GROUP')
+auth_grp = environ.get('AUTH_GROUP', '-1002306527877')
 AUTH_CHANNEL = int(auth_channel) if auth_channel and id_pattern.search(auth_channel) else None
 AUTH_GROUPS = [int(ch) for ch in auth_grp.split()] if auth_grp else None
 REQST_CHANNEL = int(reqst_channel) if reqst_channel and id_pattern.search(reqst_channel) else None
