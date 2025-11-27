@@ -1,14 +1,27 @@
-
 import sys
 import glob
 import importlib
 from pathlib import Path
-from pyrogram import idle
+from pyrogram import Client, idle, __version__
+from pyrogram.raw.all import layer
 import logging
 import logging.config
-import time  
+import time
+import asyncio
+from datetime import date, datetime
+import pytz
+from aiohttp import web
 
-# Get logging configurations
+from database.ia_filterdb import Media, Media2, choose_mediaDB, tempDict, db as clientDB
+from database.users_chats_db import db
+from info import *
+from utils import temp
+from Script import script
+from plugins import web_server, check_expired_premium, keep_alive
+from Deendayal_botz.Bot import DeendayalBot
+from Deendayal_botz.util.keepalive import ping_server
+from Deendayal_botz.Bot.clients import initialize_clients
+
 logging.config.fileConfig('logging.conf')
 logging.getLogger().setLevel(logging.INFO)
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
@@ -20,35 +33,14 @@ logging.basicConfig(
 logging.getLogger("aiohttp").setLevel(logging.ERROR)
 logging.getLogger("aiohttp.web").setLevel(logging.ERROR)
 
-from pyrogram import Client, __version__
-from pyrogram.raw.all import layer
-from database.ia_filterdb import Media, Media2, tempDict, choose_mediaDB, db as clientDB
-from database.users_chats_db import db
-from info import *
-from utils import temp
-from typing import Union, Optional, AsyncGenerator
-from pyrogram import types
-from Script import script 
-from datetime import date, datetime 
-import pytz
-from aiohttp import web
-from plugins import web_server, check_expired_premium
-
-import asyncio
-from pyrogram import idle
-from Deendayal_botz import DeendayalBot
-from util.keepalive import ping_server
-from Deendayal_botz.clients import initialize_clients
 botStartTime = time.time()
-
 ppath = "plugins/*.py"
 files = glob.glob(ppath)
-DeendayalBot.start()
-loop = asyncio.get_event_loop()
 
 async def Deendayal_start():
     print('\n')
-    print('Initalizing Deendayal Dhakad Bot')
+    print('\nInitalizing Deendayal_Botz')
+    await DeendayalBot.start()
     bot_info = await DeendayalBot.get_me()
     DeendayalBot.username = bot_info.username
     await initialize_clients()
@@ -64,7 +56,7 @@ async def Deendayal_start():
             sys.modules["plugins." + plugin_name] = load
             print("Deendayal dhakad Imported => " + plugin_name)
     if ON_HEROKU:
-        asyncio.create_task(ping_server())
+        asyncio.create_task(ping_server()) 
     b_users, b_chats = await db.get_banned()
     temp.BANNED_USERS = b_users
     temp.BANNED_CHATS = b_chats
@@ -80,7 +72,7 @@ async def Deendayal_start():
         exit()
     else:
         logging.info(f"Since primary DB have enough space ({free_dbSize}MB) left, It will be used for storing datas.")
-    await choose_mediaDB()   
+    await choose_mediaDB()    
     me = await DeendayalBot.get_me()
     temp.ME = me.id
     temp.U_NAME = me.username
@@ -88,7 +80,7 @@ async def Deendayal_start():
     temp.B_LINK = me.mention
     DeendayalBot.username = '@' + me.username
     DeendayalBot.loop.create_task(check_expired_premium(DeendayalBot))
-    logging.info(f"{me.first_name} with for Pyrogram v{__version__} (Layer {layer}) started on {me.username}.")
+    logging.info(f"{me.first_name} with Pyrogram v{__version__} (Layer {layer}) started on {me.username}.")
     logging.info(LOG_STR)
     logging.info(script.LOGO)
     tz = pytz.timezone('Asia/Kolkata')
@@ -100,10 +92,12 @@ async def Deendayal_start():
     await app.setup()
     bind_address = "0.0.0.0"
     await web.TCPSite(app, bind_address, PORT).start()
+    DeendayalBot.loop.create_task(keep_alive())
     await idle()
     
 if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(Deendayal_start())
     except KeyboardInterrupt:
-        logging.info('Service Stopped Bye 👋')  
+        logging.info('Service Stopped Bye 👋')
